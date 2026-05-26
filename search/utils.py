@@ -16,17 +16,17 @@ def calculate_score_smooth_label_V1_linear(
     beta: float = 0.05, 
     label: str = "easy"
 ) -> float:
-    # === 1. Easy 模式: 零容忍 ===
+    # === 1. Easy mode: zero tolerance ===
     if label == "easy":
         if score_i == 1:
             return score_i - beta * current_query_num
         else:
             return score_i
 
-    # === 2. Middle 模式: 仅对成功者要求高效 ===
+    # === 2. Middle mode: only require efficiency for successful cases ===
     elif label == "middle":
         if score_i == 1:
-            # 逻辑：比 thre 多搜要罚，比 thre 少搜要奖 (advantage为负，减去负数=加分)
+            # Logic: penalize for searching more than thre, reward for searching less (advantage is negative, subtracting negative = adding)
             advantage = current_query_num - query_num_thre
             advantage = max(0, advantage)
             efficiency_adjustment = beta * advantage
@@ -43,14 +43,14 @@ def calculate_score_smooth_label_V1_middle_linear(
     beta: float = 0.05, 
     label: str = "easy"
 ) -> float:
-    # === 1. Easy 模式: 零容忍 ===
+    # === 1. Easy mode: zero tolerance ===
     if label == "easy":
         return score_i
 
-    # === 2. Middle 模式: 仅对成功者要求高效 ===
+    # === 2. Middle mode: only require efficiency for successful cases ===
     elif label == "middle":
         if score_i == 1:
-            # 逻辑：比 thre 多搜要罚，比 thre 少搜要奖 (advantage为负，减去负数=加分)
+            # Logic: penalize for searching more than thre, reward for searching less (advantage is negative, subtracting negative = adding)
             advantage = current_query_num - query_num_thre
             advantage = max(0, advantage)
             efficiency_adjustment = beta * advantage
@@ -66,12 +66,12 @@ def _normalize_text(text: str) -> str:
 
 def format_reward(response: str) -> float:
     """
-    1.所有标签都符合规则（在预定义的标签当中）
-    2.所有标签中的内容都不该为空
-    3.前两个标签为think，后两个标签为answer
-    4.调用tool_call之后后面两个标签必须是tool_response和/tool_response
-    5.tool_call标签数量等于tool_response标签数量
-    6.think标签数量等于tool_call标签数量+1
+    1. All tags must conform to rules (within predefined tags)
+    2. Content within all tags must not be empty
+    3. First two tags must be think, last two tags must be answer
+    4. After tool_call, the next two tags must be tool_response and /tool_response
+    5. Number of tool_call tags must equal number of tool_response tags
+    6. Number of think tags must equal number of tool_call tags + 1
     """
 
     response = response.strip()
@@ -90,7 +90,7 @@ def format_reward(response: str) -> float:
     # Extract all tags in order
     tags = re.findall(r'<(/?(?:think|tool_call|tool_response|answer))>', response)
 
-    # 至少需要4个标签：<think></think><answer></answer>
+    # At least 4 tags required: <think></think><answer></answer>
     if len(tags) < 4:
         return False
 
@@ -140,7 +140,7 @@ def format_reward(response: str) -> float:
     return True
 
 def _kmp_prefix_function_fast(s: str) -> np.ndarray:
-    """KMP前缀函数 (NumPy实现，适合≤8192长度)"""
+    """KMP prefix function (NumPy implementation, suitable for length <= 8192)"""
     arr = np.frombuffer(s.encode('utf-8', 'ignore'), dtype=np.uint8)
     n = len(arr)
     pi = np.zeros(n, dtype=np.int32)
@@ -155,7 +155,7 @@ def _kmp_prefix_function_fast(s: str) -> np.ndarray:
 
 
 def _find_tandem_repeats_fast(text: str, min_repeat_len: int = 4) -> List[Tuple[int, int]]:
-    """检测所有连续重复片段（基于KMP前缀函数）"""
+    """Detect all consecutive repeated segments (based on KMP prefix function)"""
     n = len(text)
     pi = _kmp_prefix_function_fast(text)
     spans = []
@@ -166,7 +166,7 @@ def _find_tandem_repeats_fast(text: str, min_repeat_len: int = 4) -> List[Tuple[
             k = L // p
             if k >= 2:
                 spans.append((L - p * k, L))
-    # 合并相邻区间
+    # Merge adjacent intervals
     merged = []
     for s, e in sorted(spans):
         if merged and s <= merged[-1][1]:
@@ -178,8 +178,8 @@ def _find_tandem_repeats_fast(text: str, min_repeat_len: int = 4) -> List[Tuple[
 
 def calc_repetition_rate(text: str, min_repeat_len: int = 4) -> Tuple[float, List[Tuple[int, int, str]]]:
     """
-    极速版：适用于文本长度 <= 8192。
-    全局检测 + 合并重复片段 + 最长块占比。
+    Fast version: suitable for text length <= 8192.
+    Global detection + merge repeated segments + longest block ratio.
     """
     text = _normalize_text(text)
     n = len(text)
@@ -190,7 +190,7 @@ def calc_repetition_rate(text: str, min_repeat_len: int = 4) -> Tuple[float, Lis
     if not spans:
         return 0.0, []
 
-    # 合并并提取样本
+    # Merge and extract samples
     merged = []
     s, e = spans[0]
     for s2, e2 in spans[1:]:

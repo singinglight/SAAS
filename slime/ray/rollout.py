@@ -693,7 +693,7 @@ class RolloutManager:
     #         # combine rewards
     #         rewards = torch.cat([first_half_rewards, second_half_rewards], dim=-1)
 
-    #         # # ================= 新增逻辑：前后半段优势值调整 =================
+    #         # # ================= Added logic: first/second half advantage adjustment =================
     #         # n_samples = rewards.shape[-1]
     #         # if n_samples > 1:
     #         #     half_n = n_samples // 2
@@ -775,7 +775,7 @@ class RolloutManager:
             # combine rewards
             rewards = torch.cat([first_half_rewards, second_half_rewards], dim=-1)
 
-            # # ================= 新增逻辑：前后半段优势值调整 =================
+            # # ================= Added logic: first/second half advantage adjustment =================
             # n_samples = rewards.shape[-1]
             # if n_samples > 1:
             #     half_n = n_samples // 2

@@ -1,9 +1,6 @@
 #!/bin/bash
 set -ex
 
-# 换一种思路，对于没有检索到有用信息我就多搜，而对于检索到有用信息鼓励少搜（答案 -entail-> 检索到的文档）
-# 检索到相关文档的 v.s. 没有检索到相关文档的 搜索次数
-
 #timestamp=$(date "+%Y-%m-%d-%H:%M:%S")
 timestamp=$(date -d "+8 hour" "+%Y-%m-%d-%H:%M")
 # will prevent ray from buffering stdout/stderr
@@ -205,7 +202,7 @@ CUSTOM_ARGS=(
    --disable-search-first-n ${disable_search_first_n}
 )
 
-# 条件添加 store_true 类型的参数
+# Conditionally add store_true type arguments
 [ "$efficient_query" = "True" ] && CUSTOM_ARGS+=(--efficient-query)
 [ "$doc_rep_penalty" = "True" ] && CUSTOM_ARGS+=(--doc-rep-penalty)
 [ "$query_rep_penalty" = "True" ] && CUSTOM_ARGS+=(--query-rep-penalty)
