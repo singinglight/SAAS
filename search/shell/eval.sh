@@ -186,11 +186,11 @@ MISC_ARGS=(
 )
 
 CUSTOM_ARGS=(
-   --custom-generate-function-path search.generate_with_search_group_mqnq_differentprompt.generate
+   --custom-generate-function-path search.generate_with_search.generate
    --rollout-function-path search.sglang_rollout.generate_rollout
-   --custom-mq-rm-path search.generate_with_search_group_mqnq_differentprompt.mq_group_reward_func
-   --custom-nq-rm-path search.generate_with_search_group_mqnq_differentprompt.mq_group_reward_func
-   --custom-eval-rm-path search.generate_with_search_group_mqnq_differentprompt.eval_reward_func
+   --custom-mq-rm-path search.generate_with_search.mq_group_reward_func
+   --custom-nq-rm-path search.generate_with_search.mq_group_reward_func
+   --custom-eval-rm-path search.generate_with_search.eval_reward_func
    --group-rm
 
    # TIS-related args, recommended to enable when using TIS
@@ -214,7 +214,7 @@ CUSTOM_ARGS=(
 [ "$disable_search_tokens_for_first_half" = "True" ] && CUSTOM_ARGS+=(--disable-search-tokens-for-first-half)
 
 # Extract the custom generate function path and copy it along with rollout.py to data_saved_path
-CUSTOM_GENERATE_FILE=$(echo generate_with_search_group_mqnq_differentprompt | tr '.' '/').py
+CUSTOM_GENERATE_FILE=$(echo generate_with_search | tr '.' '/').py
 cp ${SCRIPT_DIR}/../${CUSTOM_GENERATE_FILE} ${data_saved_path}/
 cp ${SCRIPT_DIR}/../../slime/ray/rollout.py ${data_saved_path}/
 
